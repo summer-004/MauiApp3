@@ -1,45 +1,52 @@
-public class BaseViewModel : INotifyPropertyChanged
-    {
-        public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>();
+using MauiApp3.Models;
+using MauiApp3.Services;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-       bool isBusy = false;
-        public bool IsBusy
-        {
-            get { return isBusy; }
-            set { SetProperty(ref isBusy, value); }
-        }
+namespace MauiApp3.ViewMoels
+{
+    public class BaseViewModel : INotifyPropertyChanged
+    {
+        public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>();
 
-       string title = string.Empty;
-        public string Title
-        {
-            get { return title; }
-            set { SetProperty(ref title, value); }
-        }
+        bool isBusy = false;
+        public bool IsBusy
+        {
+            get { return isBusy; }
+            set { SetProperty(ref isBusy, value); }
+        }
 
-       protected bool SetProperty<T>(ref T backingStore, T value,
-            [CallerMemberName] string propertyName = "",
-            Action onChanged = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value))
-                return false;
+        string title = string.Empty;
+        public string Title
+        {
+            get { return title; }
+            set { SetProperty(ref title, value); }
+        }
 
+        protected bool SetProperty<T>(ref T backingStore, T value,
+            [CallerMemberName] string propertyName = "",
+            Action onChanged = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(backingStore, value))
+                return false;
 
-           backingStore = value;
-            onChanged?.Invoke();
-            OnPropertyChanged(propertyName);
-            return true;
-        }
+            backingStore = value;
+            onChanged?.Invoke();
+            OnPropertyChanged(propertyName);
+            return true;
+        }
 
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            var changed = PropertyChanged;
+            if (changed == null)
+                return;
 
-       #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            var changed = PropertyChanged;
-            if (changed == null)
-                return;
+            changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+    }
 
-           changed.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-    }
+}
